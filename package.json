@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsc"
+    "build": "ncc build src/index.ts -o dist"
   },
   "author": "Lorgio Roda",
   "license": "ISC",
@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.9.3",
+    "@vercel/ncc": "^0.38.3",
     "typescript": "^5.7.2"
   }
 }
