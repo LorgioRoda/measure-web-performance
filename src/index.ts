@@ -11,6 +11,20 @@ async function run(): Promise<void> {
         }
 
         const resolvedDir = path.resolve(buildDir);
+
+        const budgetPath = path.resolve(process.env.GITHUB_WORKSPACE || '', 'budget.json');
+        if (!fs.existsSync(budgetPath)) {
+            throw new Error("Budget file 'budget.json' not found in the root of the project");
+        }
+
+        const budget = JSON.parse(fs.readFileSync(budgetPath, 'utf-8'));
+        const jsBudgetKB = budget.jsBudgetKB;
+
+        if (!jsBudgetKB) {
+            throw new Error("The 'jsBudgetKB' key is missing in budget.json");
+        }
+
+        console.log(`JavaScript budget: ${jsBudgetKB} KB`);
         const jsFiles = glob.sync(`${resolvedDir}/**/*.js`, {
             ignore: ['node_modules/**'],
         });
@@ -30,6 +44,12 @@ async function run(): Promise<void> {
         const totalSizeInKB = (totalSize / 1024).toFixed(2);
         core.setOutput('js_size_kb', totalSizeInKB);
         console.log(`Total JavaScript size: ${totalSizeInKB} KB`);
+        if (totalSizeInKB > jsBudgetKB) {
+            core.setFailed(`JavaScript size (${totalSizeInKB} KB) exceeds the budget (${jsBudgetKB} KB)`);
+        } else {
+            core.setOutput('js_size_kb', totalSizeInKB);
+            console.log(`JavaScript size is within the budget.`);
+        }
     } catch (error) {
         core.setFailed('Action failed with error');
     }
