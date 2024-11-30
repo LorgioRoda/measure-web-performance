@@ -46,7 +46,7 @@ async function run(): Promise<void> {
         });
 
         const totalSizeInKB = (totalSize / 1024).toFixed(2);
-        console.log(`Total JavaScript size: ${totalSizeInKB} KB`);
+        console.log(`Total JavaScript size is: ${totalSizeInKB} KB`);
 
         if (parseFloat(totalSizeInKB) > jsBudgetKB) {
             core.setFailed(`JavaScript size (${totalSizeInKB} KB) exceeds the budget (${jsBudgetKB} KB)`);
