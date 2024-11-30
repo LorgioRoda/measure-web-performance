@@ -13,6 +13,8 @@ async function run(): Promise<void> {
         const resolvedDir = path.resolve(buildDir);
 
         const budgetPath = path.resolve(process.env.GITHUB_WORKSPACE || '', 'budget.json');
+        console.log(budgetPath, 'budgetPath');
+
         if (!fs.existsSync(budgetPath)) {
             throw new Error("Budget file 'budget.json' not found in the root of the project");
         }
