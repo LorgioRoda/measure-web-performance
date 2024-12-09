@@ -38,7 +38,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Measure JavaScript Size
-      uses: LorgioRoda/mesure-web-performance@v0.0.7
+      uses: LorgioRoda/mesure-web-performance@v1.0.1
       with:
         build_dir: ./dist
 ```
