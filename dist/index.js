@@ -25915,6 +25915,68 @@ module.exports = {
 
 /***/ }),
 
+/***/ 417:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getBudget = exports.validateBudgetFile = void 0;
+const fs = __importStar(__nccwpck_require__(9896));
+const path = __importStar(__nccwpck_require__(6928));
+const validateBudgetFile = (workspace) => {
+    const budgetPath = path.resolve(workspace, "budget.json");
+    if (!fs.existsSync(budgetPath)) {
+        throw new Error("Budget file 'budget.json' not found in the root of the project");
+    }
+    return budgetPath;
+};
+exports.validateBudgetFile = validateBudgetFile;
+const getBudget = (budgetPath) => {
+    const budget = JSON.parse(fs.readFileSync(budgetPath, "utf-8"));
+    if (!budget.jsBudgetKB) {
+        throw new Error("The 'jsBudgetKB' key is missing in budget.json");
+    }
+    return budget;
+};
+exports.getBudget = getBudget;
+
+
+/***/ }),
+
 /***/ 9407:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -25955,49 +26017,266 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(7484));
-const fs = __importStar(__nccwpck_require__(9896));
-const glob = __importStar(__nccwpck_require__(1363));
-const path = __importStar(__nccwpck_require__(6928));
+const mesuare_js_size_1 = __nccwpck_require__(9065);
 async function run() {
     try {
-        const buildDir = core.getInput('build_dir');
-        if (!buildDir) {
-            throw new Error("Input 'build_dir' is required");
-        }
-        const resolvedDir = path.resolve(buildDir);
-        const budgetPath = path.resolve(process.env.GITHUB_WORKSPACE || '', 'budget.json');
-        if (!fs.existsSync(budgetPath)) {
-            throw new Error("Budget file 'budget.json' not found in the root of the project");
-        }
-        const budget = JSON.parse(fs.readFileSync(budgetPath, 'utf-8'));
+        (0, mesuare_js_size_1.mesureJsSize)();
+    }
+    catch (error) {
+        core.setFailed("❌ Action failed with error");
+    }
+}
+run();
+
+
+/***/ }),
+
+/***/ 5938:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.findJavaScriptFiles = void 0;
+const glob = __importStar(__nccwpck_require__(1363));
+const core = __importStar(__nccwpck_require__(7484));
+const findJavaScriptFiles = (resolvedDir) => {
+    const jsFiles = glob.sync(`${resolvedDir}/**/*.js`, {
+        ignore: ["node_modules/**"],
+    });
+    if (jsFiles.length === 0) {
+        core.warning(`No JavaScript files found in ${resolvedDir}`);
+        return [];
+    }
+    return jsFiles;
+};
+exports.findJavaScriptFiles = findJavaScriptFiles;
+
+
+/***/ }),
+
+/***/ 9065:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.mesureJsSize = void 0;
+const core = __importStar(__nccwpck_require__(7484));
+const fs = __importStar(__nccwpck_require__(9896));
+const validate_budget_1 = __nccwpck_require__(417);
+const mesure_js_size_validation_1 = __nccwpck_require__(2556);
+const validate_build_directory_1 = __nccwpck_require__(9215);
+const get_js_files_1 = __nccwpck_require__(5938);
+const bytes_to_kilobytes_1 = __nccwpck_require__(8);
+const mesureJsSize = () => {
+    try {
+        const buildDir = core.getInput("build_dir");
+        const resolvedDir = (0, validate_build_directory_1.validateBuildDirectory)(buildDir);
+        const budgetPath = (0, validate_budget_1.validateBudgetFile)(process.env.GITHUB_WORKSPACE || "");
+        const budget = (0, validate_budget_1.getBudget)(budgetPath);
         const jsBudgetKB = budget.jsBudgetKB;
-        if (!jsBudgetKB) {
-            throw new Error("The 'jsBudgetKB' key is missing in budget.json");
-        }
-        const jsFiles = glob.sync(`${resolvedDir}/**/*.js`, { ignore: ['node_modules/**'] });
-        if (jsFiles.length === 0) {
-            core.warning(`No JavaScript files found in ${resolvedDir}`);
-            return;
-        }
+        const jsFiles = (0, get_js_files_1.findJavaScriptFiles)(resolvedDir);
         let totalSize = 0;
         jsFiles.forEach((file) => {
             const stats = fs.statSync(file);
             totalSize += stats.size;
         });
-        const totalSizeInKB = (totalSize / 1024).toFixed(2);
-        if (parseFloat(totalSizeInKB) > jsBudgetKB) {
-            core.setFailed(`❌ JavaScript size (${totalSizeInKB} KB) exceeds the budget (${jsBudgetKB} KB). Please optimize your build.`);
-        }
-        else {
-            core.setOutput('js_size_kb', totalSizeInKB);
-            console.log(`✅ JavaScript size is within the budget.`);
-        }
+        const totalSizeInKB = (0, bytes_to_kilobytes_1.bytesToKilobytes)(totalSize);
+        (0, mesure_js_size_validation_1.validateJavaScriptSize)({ totalSizeInKB, jsBudgetKB });
     }
     catch (error) {
-        core.setFailed('❌ Action failed with error');
+        core.setFailed("❌ Action failed with error");
     }
-}
-run();
+};
+exports.mesureJsSize = mesureJsSize;
+
+
+/***/ }),
+
+/***/ 2556:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.validateJavaScriptSize = void 0;
+const core = __importStar(__nccwpck_require__(7484));
+const validateJavaScriptSize = ({ totalSizeInKB, jsBudgetKB, }) => {
+    if (parseFloat(totalSizeInKB) > jsBudgetKB) {
+        core.setFailed(`❌ JavaScript size (${totalSizeInKB} KB) exceeds the budget (${jsBudgetKB} KB). Please optimize your build.`);
+    }
+    else {
+        core.setOutput("js_size_kb", totalSizeInKB);
+        console.log(`✅ JavaScript size is within the budget.`);
+    }
+};
+exports.validateJavaScriptSize = validateJavaScriptSize;
+
+
+/***/ }),
+
+/***/ 8:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.bytesToKilobytes = void 0;
+const bytesToKilobytes = (bytes) => (bytes / 1024).toFixed(2);
+exports.bytesToKilobytes = bytesToKilobytes;
+
+
+/***/ }),
+
+/***/ 9215:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.validateBuildDirectory = void 0;
+const fs = __importStar(__nccwpck_require__(9896));
+const path = __importStar(__nccwpck_require__(6928));
+const validateBuildDirectory = (buildDir) => {
+    if (!buildDir || !fs.existsSync(buildDir)) {
+        throw new Error(`Invalid or missing build directory: ${buildDir}`);
+    }
+    return path.resolve(buildDir);
+};
+exports.validateBuildDirectory = validateBuildDirectory;
 
 
 /***/ }),
