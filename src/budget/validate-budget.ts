@@ -18,3 +18,11 @@ export const getBudget = (budgetPath: string): { jsBudgetKB: number } => {
   }
   return budget;
 };
+
+export const getCssBudget = (budgetPath: string): { cssBudgetKB: number } => {
+  const budget = JSON.parse(fs.readFileSync(budgetPath, "utf-8"));
+  if (!budget.jsBudgetKB) {
+    throw new Error("The 'jsBudgetKB' key is missing in budget.json");
+  }
+  return budget;
+};

@@ -1,12 +1,12 @@
 import * as core from "@actions/core";
 import * as fs from "fs";
 import { getBudget, validateBudgetFile } from "../budget/validate-budget";
-import { validateJavaScriptSize } from "./mesure-js-size-validation";
+import { validateJavaScriptSize } from "./validate-javascript-size";
 import { validateBuildDirectory } from "../util/validate-build-directory";
-import { findJavaScriptFiles } from "./get-js-files";
+import { findJavaScriptFiles } from "./find-javascript-files";
 import { bytesToKilobytes } from "../util/bytes-to-kilobytes";
 
-export const mesureJsSize = (): void => {
+export const measureJsSize = (): void => {
   try {
     const buildDir = core.getInput("build_dir");
     const resolvedDir = validateBuildDirectory(buildDir);
