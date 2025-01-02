@@ -1,9 +1,9 @@
 import * as core from "@actions/core";
-import { mesureJsSize } from "./javascript/mesuare-js-size";
+import { measureJsSize } from "./javascript/measuare-js-size";
 
 async function run(): Promise<void> {
   try {
-    mesureJsSize();
+    measureJsSize();
   } catch (error) {
     core.setFailed("❌ Action failed with error");
   }
