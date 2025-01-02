@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-export interface SizeValidationInput {
+interface SizeValidationInput {
   totalSizeInKB: string;
   jsBudgetKB: number;
 }
