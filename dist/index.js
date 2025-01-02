@@ -25954,7 +25954,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getBudget = exports.validateBudgetFile = void 0;
+exports.getCssBudget = exports.getBudget = exports.validateBudgetFile = void 0;
 const fs = __importStar(__nccwpck_require__(9896));
 const path = __importStar(__nccwpck_require__(6928));
 const validateBudgetFile = (workspace) => {
@@ -25973,6 +25973,14 @@ const getBudget = (budgetPath) => {
     return budget;
 };
 exports.getBudget = getBudget;
+const getCssBudget = (budgetPath) => {
+    const budget = JSON.parse(fs.readFileSync(budgetPath, "utf-8"));
+    if (!budget.jsBudgetKB) {
+        throw new Error("The 'jsBudgetKB' key is missing in budget.json");
+    }
+    return budget;
+};
+exports.getCssBudget = getCssBudget;
 
 
 /***/ }),
@@ -26017,10 +26025,10 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(7484));
-const mesuare_js_size_1 = __nccwpck_require__(9065);
+const measuare_js_size_1 = __nccwpck_require__(8960);
 async function run() {
     try {
-        (0, mesuare_js_size_1.mesureJsSize)();
+        (0, measuare_js_size_1.measureJsSize)();
     }
     catch (error) {
         core.setFailed("❌ Action failed with error");
@@ -26031,7 +26039,7 @@ run();
 
 /***/ }),
 
-/***/ 5938:
+/***/ 252:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -26088,7 +26096,7 @@ exports.findJavaScriptFiles = findJavaScriptFiles;
 
 /***/ }),
 
-/***/ 9065:
+/***/ 8960:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -26127,40 +26135,40 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.mesureJsSize = void 0;
+exports.measureJsSize = void 0;
 const core = __importStar(__nccwpck_require__(7484));
 const fs = __importStar(__nccwpck_require__(9896));
 const validate_budget_1 = __nccwpck_require__(417);
-const mesure_js_size_validation_1 = __nccwpck_require__(2556);
+const validate_javascript_size_1 = __nccwpck_require__(4747);
 const validate_build_directory_1 = __nccwpck_require__(9215);
-const get_js_files_1 = __nccwpck_require__(5938);
+const find_javascript_files_1 = __nccwpck_require__(252);
 const bytes_to_kilobytes_1 = __nccwpck_require__(8);
-const mesureJsSize = () => {
+const measureJsSize = () => {
     try {
         const buildDir = core.getInput("build_dir");
         const resolvedDir = (0, validate_build_directory_1.validateBuildDirectory)(buildDir);
         const budgetPath = (0, validate_budget_1.validateBudgetFile)(process.env.GITHUB_WORKSPACE || "");
         const budget = (0, validate_budget_1.getBudget)(budgetPath);
         const jsBudgetKB = budget.jsBudgetKB;
-        const jsFiles = (0, get_js_files_1.findJavaScriptFiles)(resolvedDir);
+        const jsFiles = (0, find_javascript_files_1.findJavaScriptFiles)(resolvedDir);
         let totalSize = 0;
         jsFiles.forEach((file) => {
             const stats = fs.statSync(file);
             totalSize += stats.size;
         });
         const totalSizeInKB = (0, bytes_to_kilobytes_1.bytesToKilobytes)(totalSize);
-        (0, mesure_js_size_validation_1.validateJavaScriptSize)({ totalSizeInKB, jsBudgetKB });
+        (0, validate_javascript_size_1.validateJavaScriptSize)({ totalSizeInKB, jsBudgetKB });
     }
     catch (error) {
         core.setFailed("❌ Action failed with error");
     }
 };
-exports.mesureJsSize = mesureJsSize;
+exports.measureJsSize = measureJsSize;
 
 
 /***/ }),
 
-/***/ 2556:
+/***/ 4747:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
